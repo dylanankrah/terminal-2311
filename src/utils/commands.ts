@@ -113,14 +113,5 @@ export const commands: Record<string, (args: string[]) => Promise<string> | stri
       return `curl: could not fetch URL ${url}. Details: ${error}`;
     }
   },
-  banner: () => `
-███╗   ███╗██╗  ██╗████████╗████████╗███████╗██████╗
-████╗ ████║██║  ██║╚══██╔══╝╚══██╔══╝╚════██║╚════██╗
-██╔████╔██║███████║   ██║      ██║       ██╔╝ █████╔╝
-██║╚██╔╝██║╚════██║   ██║      ██║      ██╔╝ ██╔═══╝
-██║ ╚═╝ ██║     ██║   ██║      ██║      ██║  ███████╗
-╚═╝     ╚═╝     ╚═╝   ╚═╝      ╚═╝      ╚═╝  ╚══════╝ v${packageJson.version}
-
-Type 'help' to see list of available commands.
-`,
+  banner: () => `Type 'help' to see list of available commands.`,
 };

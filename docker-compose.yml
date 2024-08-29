@@ -1,6 +1,6 @@
 services:
   terminal:
-    #image: ghcr.io/m4tt72/terminal:svelte
+    # image: ghcr.io/m4tt72/terminal:svelte
     build: .
     container_name: terminal
     restart: unless-stopped
