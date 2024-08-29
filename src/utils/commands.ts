@@ -1,117 +1,81 @@
 import packageJson from '../../package.json';
-import themes from '../../themes.json';
 import { history } from '../stores/history';
-import { theme } from '../stores/theme';
-
-const hostname = window.location.hostname;
+import { enigmas, getEnigma } from '../interfaces/enigma';
 
 export const commands: Record<string, (args: string[]) => Promise<string> | string> = {
-  help: () => 'Available commands: ' + Object.keys(commands).join(', '),
-  hostname: () => hostname,
-  whoami: () => 'guest',
-  date: () => new Date().toLocaleString(),
-  vi: () => `why use vi? try 'emacs'`,
-  vim: () => `why use vim? try 'emacs'`,
-  emacs: () => `why use emacs? try 'vim'`,
-  echo: (args: string[]) => args.join(' '),
-  sudo: (args: string[]) => {
-    window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+  help: () => {
+    const introText = `
+Welcome to the Enigma Game!
+Your objective is to solve a series of enigmas by using specific commands.
+Each enigma will provide you with a key upon solving it. Collect all the keys to unlock the final message.
 
-    return `Permission denied: unable to run the command '${args[0]}' as root.`;
-  },
-  theme: (args: string[]) => {
-    const usage = `Usage: theme [args].
-    [args]:
-      ls: list all available themes
-      set: set theme to [theme]
+Here are the commands you can use:
+`;
 
-    [Examples]:
-      theme ls
-      theme set gruvboxdark
-    `;
-    if (args.length === 0) {
-      return usage;
-    }
+    const commandDescriptions = {
+      enigma: "enigma <number>: View the enigma with the given number.",
+      hint: "enigma <number> hint: Get a hint for the specified enigma.",
+      answer: "enigma <number> <answer>: Submit an answer for the specified enigma.",
+      unlock: "unlock <key1> <key2> ...: Use the keys you've collected to unlock the final message.",
+      help: "help: Display this help message.",
+      clear: "clear: Clear the terminal screen.",
+      // Add descriptions for other relevant commands as needed...
+    };
 
-    switch (args[0]) {
-      case 'ls': {
-        let result = themes.map((t) => t.name.toLowerCase()).join(', ');
-        result += `You can preview all these themes here: ${packageJson.repository.url}/tree/master/docs/themes`;
+    const availableCommands = Object.keys(commandDescriptions).map(command => {
+      return `- ${command}: ${commandDescriptions[command] || 'No description available.'}`;
+    }).join('\n');
 
-        return result;
-      }
-
-      case 'set': {
-        if (args.length !== 2) {
-          return usage;
-        }
-
-        const selectedTheme = args[1];
-        const t = themes.find((t) => t.name.toLowerCase() === selectedTheme);
-
-        if (!t) {
-          return `Theme '${selectedTheme}' not found. Try 'theme ls' to see all available themes.`;
-        }
-
-        theme.set(t);
-
-        return `Theme set to ${selectedTheme}`;
-      }
-
-      default: {
-        return usage;
-      }
-    }
-  },
-  repo: () => {
-    window.open(packageJson.repository.url, '_blank');
-
-    return 'Opening repository...';
+    return introText + availableCommands;
   },
   clear: () => {
     history.set([]);
 
     return '';
   },
-  email: () => {
-    window.open(`mailto:${packageJson.author.email}`);
-
-    return `Opening mailto:${packageJson.author.email}...`;
-  },
-  donate: () => {
-    window.open(packageJson.funding.url, '_blank');
-
-    return 'Opening donation url...';
-  },
-  weather: async (args: string[]) => {
-    const city = args.join('+');
-
-    if (!city) {
-      return 'Usage: weather [city]. Example: weather Brussels';
-    }
-
-    const weather = await fetch(`https://wttr.in/${city}?ATm`);
-
-    return weather.text();
-  },
-  exit: () => {
-    return 'Please close the tab to exit.';
-  },
-  curl: async (args: string[]) => {
+  enigma: (args: string[]) => {
     if (args.length === 0) {
-      return 'curl: no URL provided';
+      return 'Usage: enigma <number>, enigma <number> <answer>, or enigma <number> hint';
     }
 
-    const url = args[0];
+    const enigmaId = parseInt(args[0]);
+    const enigma = getEnigma(enigmaId);
 
-    try {
-      const response = await fetch(url);
-      const data = await response.text();
+    if (!enigma) {
+      return `Enigma ${enigmaId} does not exist.`;
+    }
 
-      return data;
-    } catch (error) {
-      return `curl: could not fetch URL ${url}. Details: ${error}`;
+    if (args[1] === 'hint') {
+      return `Hint: ${enigma.hint}`;
+    } else if (args[1]) {
+      const userAnswer = args.slice(1).join(' ').toLowerCase();
+      if (userAnswer === enigma.answer.toLowerCase()) {
+        return `Correct! Your key: ${enigma.key}`;
+      } else {
+        return 'Incorrect answer. Try again.';
+      }
+    } else {
+      return `Enigma ${enigma.id}: ${enigma.question}`;
     }
   },
-  banner: () => `Type 'help' to see list of available commands.`,
+  unlock: (args: string[]) => {
+    if (args.length !== enigmas.length) {
+      return `You need to provide ${enigmas.length} keys to unlock.`;
+    }
+
+    const incorrectKeys: string[] = [];
+
+    // Compare provided keys with the correct ones
+    enigmas.forEach((enigma, index) => {
+      if (enigma.key !== args[index]) {
+        incorrectKeys.push(`Key #${index + 1} ('${args[index]}')`);
+      }
+    });
+
+    if (incorrectKeys.length === 0) {
+      return 'Congratulations! You have successfully unlocked the final message!';
+    } else {
+      return `Some keys are incorrect: ${incorrectKeys.join(', ')}`;
+    }
+  },
 };
