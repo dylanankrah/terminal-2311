@@ -4,9 +4,10 @@ import { enigmas, getEnigma } from '../interfaces/enigma';
 
 export const commands: Record<string, (args: string[]) => Promise<string> | string> = {
   help: () => {
+    const numberOfEnigmas = enigmas.length;
     const introText = `
 Welcome to the Enigma Game!
-Your objective is to solve a series of enigmas by using specific commands.
+Your objective is to solve a series of ${numberOfEnigmas} increasingly difficult enigmas (from 1 to ${numberOfEnigmas}) by using specific commands.
 Each enigma will provide you with a key upon solving it. Collect all the keys to unlock the final message.
 
 Here are the commands you can use:

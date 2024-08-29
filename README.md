@@ -1,27 +1,19 @@
-# Quick Start
+# Disclaimer
 
-### Using npm/yarn
+This code is under MIT License: Copyright (c) 2024 Yassine Fathi (see: LICENSE). Original repository link: https://github.com/m4tt72/terminal.
+
+This repository is deployed at: https://terminal-2311.vercel.app/.
+
+# Local development
 
 1. Install dependencies:
 
 ```bash
-yarn install
+npm install
 ```
 
-3. Run the server:
+2. Run the server:
 
 ```bash
-yarn dev
+npm run dev
 ```
-
-### Using docker (obsolete)
-
-```bash
-docker run -d --name terminal -p 3000:3000 ghcr.io/m4tt72/terminal
-```
-
-## Themes
-
-![themes](/docs/screenshot.gif)
-
-[Here's](/docs/themes) a list of available themes.
