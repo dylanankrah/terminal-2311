@@ -9,7 +9,7 @@ lerna-debug.log*
 
 node_modules
 # docs
-_docs
+docs_old
 dist
 dist-ssr
 *.local
